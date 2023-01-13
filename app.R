@@ -2,9 +2,7 @@ library(qs)
 library(shiny)
 library(tidyverse)
 library(cowplot)
-library(dplyr)
 library(ggpubr)
-library(shinyjs)
 #load functions
 source('helpers.R')
 
