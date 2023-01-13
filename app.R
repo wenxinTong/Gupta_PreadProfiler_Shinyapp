@@ -2,8 +2,6 @@ library(qs)
 library(tidyverse)
 library(cowplot)
 library(ggpubr)
-library(Cairo)
-options(shiny.usecairo=T)
 
 source('helpers.R')
 
