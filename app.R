@@ -1,9 +1,10 @@
 library(qs)
-library(shiny)
 library(tidyverse)
 library(cowplot)
 library(ggpubr)
-#load functions
+library(Cairo)
+options(shiny.usecairo=T)
+
 source('helpers.R')
 
 #load data
@@ -11,6 +12,7 @@ multiomics_data <- qs::qread("data/multiomics_data.qs")
 cold_data <- qs::qread("data/cold_response_data.qs")
 # Define UI for application that draws a plot
 ui <- fluidPage(
+  theme = "theme.css",
   tabsetPanel(
     tabPanel(
       titlePanel("Adipocyte Precursor Profile"),
@@ -19,10 +21,14 @@ ui <- fluidPage(
           textInput("name", "Gene Name"),
           actionButton("search", "Search"),
           actionButton("clear", "Clear"),
+          br(),
+          tags$h4("choose the plot size"),
+          sliderInput("height", "height", min = 800, max = 2000, value = 1500),
+          sliderInput("width", "width", min = 1200, max = 2000, value = 1500),
         ),
         # Show a plot of the generated distribution
         mainPanel(
-          plotOutput("multiomics_plot",width = "100%", height = "800px"),
+          plotOutput("multiomics_plot",width = 1000, height = 1000),
         )
       )
     ),
@@ -33,10 +39,14 @@ ui <- fluidPage(
           textInput("gene", "Gene Name"),
           actionButton("start", "Search"),
           actionButton("reset", "Clear"),
+          br(),
+          tags$h4("choose the plot size"),
+          sliderInput("heights", "height", min = 200, max = 500, value = 400),
+          sliderInput("widths", "width", min = 400, max = 1000, value = 800),
         ),
         # Show a plot of the generated distribution
         mainPanel(
-          plotOutput("cold_plot",width = "80%", height = "500px"),
+          plotOutput("cold_plot",width = 1000, height = 1000),
         )
       )
     ),
@@ -106,7 +116,9 @@ server <- function(input, output) {
     output$multiomics_plot<-renderPlot({
        multiomics_boxplot(dataframe = multiomics_data,
                  fav_gene = gene_string)
-  })
+  },width = function() input$width,
+    height = function() input$height,
+    res = 96)
   })
   
   observeEvent(input$clear, {
@@ -118,7 +130,9 @@ server <- function(input, output) {
     output$cold_plot<-renderPlot({
       cold_boxplot(dataframe = cold_data,
                          fav_gene = gene_name)
-    })
+    },width = function() input$widths,
+    height = function() input$heights,
+    res = 96)
   })
   
   observeEvent(input$reset, {
